@@ -12,6 +12,7 @@ import { useFormState } from "react-dom";
 import { useActionState, useState } from "react";
 import { userFormValidation } from "@/lib/validation";
 import { useRouter } from "next/navigation";
+import { createUSer } from "@/lib/actions/patient.actions";
 
 export enum FormFieldType {
   INPUT = "input",
@@ -24,7 +25,7 @@ export enum FormFieldType {
 }
 
 const PatientForm = () => {
-    const router = useRouter()
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof userFormValidation>>({
@@ -43,14 +44,14 @@ const PatientForm = () => {
   }: z.infer<typeof userFormValidation>) {
     setIsLoading(true);
     try {
-    //   const userData = {
-    //     name,
-    //     email,
-    //     phone,
-    //   };
+      const userData = {
+        name,
+        email,
+        phone,
+      };
 
-    //   const user = await createUser(userData);
-    //   if(user) router.push(`/patinets/${user.$id}/register`)
+      const user = await createUSer(userData);
+      if (user) router.push(`/patinets/${user.$id}/register`);
     } catch (error) {
       console.log(error);
     }
