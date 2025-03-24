@@ -1,5 +1,6 @@
 import { ID, Query } from "node-appwrite"
 import { users } from "../appwrite.config"
+import { parseStringify } from "../utils";
 
 export const createUSer = async (user: CreateUserParams) => {
     try {
@@ -9,10 +10,13 @@ export const createUSer = async (user: CreateUserParams) => {
             user.phone,
             undefined,
             user.name)
+            console.log({newUser});
+            
+            return parseStringify(newUser)
     } catch (error: any) {
-        if(error && error?.code ===409){
+        if(error && error?.code === 409){
             const documents = await users.list([
-                Query.equal('email', [user.email])
+                Query.equal("email", [user.email])
             ])
             return documents?.users[0]
         }

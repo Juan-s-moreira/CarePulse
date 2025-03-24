@@ -4,12 +4,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import CustomFormField from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
-import { useFormState } from "react-dom";
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { userFormValidation } from "@/lib/validation";
 import { useRouter } from "next/navigation";
 import { createUSer } from "@/lib/actions/patient.actions";
@@ -19,7 +18,7 @@ export enum FormFieldType {
   TEXTAREA = "textarea",
   PHONE_INPUT = "phone_input",
   CHECKBOX = "checkbox",
-  DATE_PICKER = "datepicker",
+  DATE_PICKER = "datePicker",
   SELECT = "select",
   SKELETON = "skeleton",
 }
@@ -51,7 +50,8 @@ const PatientForm = () => {
       };
 
       const user = await createUSer(userData);
-      if (user) router.push(`/patinets/${user.$id}/register`);
+
+      if (user) router.push(`/patients/${user.$id}/register`);
     } catch (error) {
       console.log(error);
     }
@@ -61,7 +61,7 @@ const PatientForm = () => {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 flex-1">
         <section className="mb-12 space-y-4">
           <h1 className="header">Hi There👋</h1>
-          <p className="text-dark-700">Schedule your fisrt appointment.</p>
+          <p className="text-dark-700">Schedule your first appointment.</p>
         </section>
 
         <CustomFormField
@@ -89,7 +89,7 @@ const PatientForm = () => {
           control={form.control}
           name="phone"
           label="Phone number"
-          placeholder="(11) 912345-6789"
+          placeholder="(555) 123-4567"
         />
 
         <SubmitButton isLoading={isLoading}>Get Started</SubmitButton>
