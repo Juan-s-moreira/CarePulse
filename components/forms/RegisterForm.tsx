@@ -4,17 +4,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+//  userFormValidation
 // import { Button } from "@/components/ui/button";
 import { Form, FormControl } from "@/components/ui/form";
 import CustomFormField from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
 import { useState } from "react";
-import { userFormValidation } from "@/lib/validation";
+import { PatientFormValidation } from "@/lib/validation";
 import { useRouter } from "next/navigation";
-import { createUSer } from "@/lib/actions/patient.actions";
+import { createUSer, registerPatient } from "@/lib/actions/patient.actions";
 import { FormFieldType } from "./PatientForm";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
-import { Doctors, GenderOptions, IdentificationTypes } from "@/constants";
+import {
+  Doctors,
+  GenderOptions,
+  IdentificationTypes,
+  PatientFormDefaultValues,
+} from "@/constants";
 import { Label } from "../ui/label";
 import { Select, SelectItem } from "../ui/select";
 import Image from "next/image";
@@ -34,31 +40,45 @@ const RegisterForm = ({ user }: { user: User }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof userFormValidation>>({
-    resolver: zodResolver(userFormValidation),
+  const form = useForm<z.infer<typeof PatientFormValidation>>({
+    resolver: zodResolver(PatientFormValidation),
     defaultValues: {
+      ...PatientFormDefaultValues,
       name: "",
       email: "",
       phone: "",
     },
   });
 
-  async function onSubmit({
-    name,
-    email,
-    phone,
-  }: z.infer<typeof userFormValidation>) {
+  async function onSubmit(values: z.infer<typeof PatientFormValidation>) {
     setIsLoading(true);
+
+
+    let formData;
+
+    if (
+      values.identificationDocument &&
+      values.identificationDocument.length > 0
+    ) {
+      const blobFile = new Blob([values.identificationDocument[0]], {
+        type: values.identificationDocument[0].type,
+      });
+
+      formData = new FormData();
+      formData.append("blobFile", blobFile);
+      formData.append("fileName", values.identificationDocument[0].name);
+    }
+
     try {
-      const userData = {
-        name,
-        email,
-        phone,
+      const patientData = {
+        ...values,
+        userId: user.$id,
+        birthDate: new Date(values.birthDate),
+        identificationDocument: formData,
       };
-
-      const user = await createUSer(userData);
-
-      if (user) router.push(`/patients/${user.$id}/register`);
+      // @ts-ignore
+      const patient = await registerPatient(patientData);
+      if (patient) router.push(`/patients/${user.$id}/new-appointment`);
     } catch (error) {
       console.log(error);
     }
@@ -186,8 +206,8 @@ const RegisterForm = ({ user }: { user: User }) => {
           <CustomFormField
             fieldType={FormFieldType.SELECT}
             control={form.control}
-            name="primaryPhisician"
-            label="Primary Phisician"
+            name="primaryPhysician"
+            label="Primary Physician"
             placeholder="Select a physycian"
           >
             {Doctors.map((doctor) => (
@@ -300,25 +320,25 @@ const RegisterForm = ({ user }: { user: User }) => {
           </div>
         </section>
 
-        <CustomFormField 
-        fieldType={FormFieldType.CHECKBOX}
-        control={form.control}
-        name="treatmentConsent"
-        label="I consent to treatment"
+        <CustomFormField
+          fieldType={FormFieldType.CHECKBOX}
+          control={form.control}
+          name="treatmentConsent"
+          label="I consent to treatment"
         />
 
-        <CustomFormField 
-        fieldType={FormFieldType.CHECKBOX}
-        control={form.control}
-        name="disclosureConsent"
-        label="I consent to disclosure of information "
+        <CustomFormField
+          fieldType={FormFieldType.CHECKBOX}
+          control={form.control}
+          name="disclosureConsent"
+          label="I consent to disclosure of information "
         />
 
-        <CustomFormField 
-        fieldType={FormFieldType.CHECKBOX}
-        control={form.control}
-        name="privacyConsent"
-        label="I consent to privacy policy"
+        <CustomFormField
+          fieldType={FormFieldType.CHECKBOX}
+          control={form.control}
+          name="privacyConsent"
+          label="I consent to privacy policy"
         />
         <div className="flex flex-col gap-6 xl:flex-rol"></div>
         <div className="flex flex-col gap-6 xl:flex-rol"></div>
