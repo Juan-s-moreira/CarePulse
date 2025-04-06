@@ -23,7 +23,7 @@ export const createAppointment = async (appointment: CreateAppointmentParams) =>
       
 }
 
-export const getAppointment = async (appointmentId: sttring) => {
+export const getAppointment = async (appointmentId: string) => {
     try {
         const appointment = await databases.getDocument(
             DATABASE_ID!,
