@@ -5,7 +5,6 @@ import { BUCKET_ID, DATABASE_ID, databases, ENDPOINT, PATIENT_COLLECTION_ID, PRO
 import { parseStringify } from "../utils";
 
 import { InputFile } from 'node-appwrite/file'
-import { parse } from "path";
 
 export const createUSer = async (user: CreateUserParams) => {
     try {
